@@ -1,1 +1,2 @@
 # Analysing-life-expectancy-and-health-expenditure-trends---Python-project-
+Analysing life expectancy and health expenditure trends by country. 'life-expectancy' and 'annual-healthcare-expenditure-per-capita' datasets downloaded from "Our World in Data.org", has data on life expectancy and health care expenditure by country by year.This project asks a series of questions for data manipulation, extracting trends, plotting and merging of the data from the two datasets and anwers them with Python scripts.
