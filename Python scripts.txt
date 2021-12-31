@@ -1,0 +1,75 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Dec 25 21:14:25 2021
+
+@author: dharm
+"""
+
+#Analysis of Global Life Expectancy, causes and effects
+#Datasets downloaded from ourworldindata.org
+
+
+# 1. import pandas and matplotlib libraries, read the 'life expectancy' file as a dataframe 
+#and print the first few rows of the file
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+life_exp_df = pd.read_csv(r'C:\Users\dharm\OneDrive\Desktop\Training\Python Project  - Life Expectancy\life-expectancy.csv')
+print(life_exp_df.head())
+
+# 2. List the top 20 countries with the highest life expectancy in the year 2019
+
+life_exp_latest = life_exp_df[life_exp_df['Year']==2019]
+life_exp_latest = life_exp_latest.sort_values('Life expectancy',ascending = False)
+print(life_exp_latest.head(20))
+
+# 3. Extract the countries with the highest and lowest life expectancy in the year 2019 and print
+
+life_exp_latest = life_exp_df[life_exp_df['Year']==2019]
+life_exp_latest = life_exp_latest.sort_values('Life expectancy',ascending = False)
+life_exp_highest_country = life_exp_latest['Entity'].iloc[0]
+life_exp_latest = life_exp_latest.sort_values('Life expectancy',ascending = True)
+life_exp_lowest_country = life_exp_latest['Entity'].iloc[0]
+print("Country with highest life expectancy: ",life_exp_highest_country)
+print("Country with lowest life expectancy: ",life_exp_lowest_country)
+
+# 4. Plot the life expectancy for the highest and lowest country
+
+life_exp_highest = life_exp_df[life_exp_df['Entity']==life_exp_highest_country]
+life_exp_lowest = life_exp_df[life_exp_df['Entity']==life_exp_lowest_country]
+
+
+
+ax = life_exp_highest.plot(kind ='line',x='Year',y='Life expectancy',label=life_exp_highest_country)
+life_exp_lowest.plot(ax=ax,kind ='line',x='Year',y='Life expectancy',label=life_exp_lowest_country,title='Life Expectancy')
+
+# 5. Print and plot the global average life expectancy from the year 1970
+life_exp_global = life_exp_df.groupby(['Year'],as_index=False).mean()
+life_exp_global = life_exp_global[life_exp_global['Year']>=1970]
+print(life_exp_global)
+life_exp_global.plot(kind='line',x='Year',y='Life expectancy',title='GLobal Life Expectancy')
+
+
+# 6. Read the 'annual health expenditure per capita file' as a dataframe 
+health_exp_df = pd.read_csv(r'C:\Users\dharm\OneDrive\Desktop\Training\Python Project  - Life Expectancy\annual-healthcare-expenditure-per-capita.csv')
+print(health_exp_df.head())
+
+# 7. Merge the 'life expectancy' and 'annual health expenditure per capita files' on the column 'code'
+life_health_df = life_exp_df.merge(health_exp_df, how='left',on='Code',suffixes=('_life','_health'))
+print(life_health_df)
+
+#8. List the top 5 and bottom 5 countries that spend on 'annual health expenditure per capita'
+#in the year 2014
+
+life_health_2014 = life_health_df[life_health_df['Year_health']==2014]
+print(life_health_2014)
+life_health_country = life_health_2014.groupby('Entity_life',as_index=False).agg('mean')
+life_health_country = life_health_country.sort_values('Health exp per capita($)',ascending=False)
+print(life_health_country)
+health_top5 = life_health_country['Entity_life'].iloc[0:5]
+life_health_country = life_health_country.sort_values('Health exp per capita($)',ascending=True)
+health_bottom5 = life_health_country['Entity_life'].iloc[0:5]
+print('Top5 countries are:\n',health_top5)
+print('Bottom5 countries are:\n',health_bottom5)
+
