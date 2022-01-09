@@ -14,6 +14,7 @@ Created on Sat Dec 25 21:14:25 2021
 
 import pandas as pd
 import matplotlib.pyplot as plt
+pd.set_option('display.max_columns', None)
 
 life_exp_df = pd.read_csv(r'C:\Users\dharm\OneDrive\Desktop\Training\Python Project  - Life Expectancy\life-expectancy.csv')
 print(life_exp_df.head())
@@ -39,30 +40,30 @@ print("Country with lowest life expectancy: ",life_exp_lowest_country)
 life_exp_highest = life_exp_df[life_exp_df['Entity']==life_exp_highest_country]
 life_exp_lowest = life_exp_df[life_exp_df['Entity']==life_exp_lowest_country]
 
-
-
 ax = life_exp_highest.plot(kind ='line',x='Year',y='Life expectancy',label=life_exp_highest_country)
 life_exp_lowest.plot(ax=ax,kind ='line',x='Year',y='Life expectancy',label=life_exp_lowest_country,title='Life Expectancy')
 
 # 5. Print and plot the global average life expectancy from the year 1970
+
 life_exp_global = life_exp_df.groupby(['Year'],as_index=False).mean()
 life_exp_global = life_exp_global[life_exp_global['Year']>=1970]
 print(life_exp_global)
 life_exp_global.plot(kind='line',x='Year',y='Life expectancy',title='GLobal Life Expectancy')
 
-
 # 6. Read the 'annual health expenditure per capita file' as a dataframe 
+
 health_exp_df = pd.read_csv(r'C:\Users\dharm\OneDrive\Desktop\Training\Python Project  - Life Expectancy\annual-healthcare-expenditure-per-capita.csv')
 print(health_exp_df.head())
 
 # 7. Merge the 'life expectancy' and 'annual health expenditure per capita files' on the column 'code'
-life_health_df = life_exp_df.merge(health_exp_df, how='left',on='Code',suffixes=('_life','_health'))
+
+life_health_df = life_exp_df.merge(health_exp_df, how='right',on=['Code','Year'],suffixes=('_life','_health'))
 print(life_health_df)
 
 #8. List the top 5 and bottom 5 countries that spend on 'annual health expenditure per capita'
 #in the year 2014
 
-life_health_2014 = life_health_df[life_health_df['Year_health']==2014]
+life_health_2014 = life_health_df[life_health_df['Year']==2014]
 print(life_health_2014)
 life_health_country = life_health_2014.groupby('Entity_life',as_index=False).agg('mean')
 life_health_country = life_health_country.sort_values('Health exp per capita($)',ascending=False)
@@ -72,4 +73,19 @@ life_health_country = life_health_country.sort_values('Health exp per capita($)'
 health_bottom5 = life_health_country['Entity_life'].iloc[0:5]
 print('Top5 countries are:\n',health_top5)
 print('Bottom5 countries are:\n',health_bottom5)
+
+#9. Add two columns for the percentage increase in "Life Expectancy" and "Health Expenditure"
+
+print(life_health_df)
+life_health_df = life_health_df.sort_values(['Code','Year']) 
+life_health_df['%_Life_Change'] = life_health_df['Life expectancy'].pct_change(periods=1)
+life_health_df['%_Health_Exp_Change'] = life_health_df['Health exp per capita($)'].pct_change(periods=1)
+print(life_health_df)
+
+#10. Plot the global average '%_Life_Change' and '%_Health_Exp_Change' by year from the year 1995
+
+life_health_year = life_health_df.groupby(['Year'],as_index=False).mean()
+print(life_health_year)
+ax=life_health_year.plot(kind='line',x='Year',y='%_Life_Change')
+life_health_year.plot(ax=ax,kind='line',x='Year',y='%_Health_Exp_Change')
 
